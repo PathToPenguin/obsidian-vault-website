@@ -1,0 +1,73 @@
+name: Publish to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install Obsidian to HTML converter
+      run: |
+        npm install -g @obsidianhtml/obsidianhtml
+    
+    - name: Convert Obsidian to HTML
+      run: |
+        mkdir -p output
+        # Create basic config for obsidianhtml
+        cat > config.yml << EOF
+        obsidian_folder_path_str: './vault'
+        obsidian_entrypoint_path_str: './vault/index.md'
+        html_output_folder_path_str: './output'
+        site_name: 'Obsidian Vault'
+        navbar_links:
+          - name: 'Home'
+            link: '/'
+        toggles:
+          features:
+            styling:
+              layout: 'documentation'
+            code_highlight: True
+            mermaid_diagrams: True
+            callout_support: True
+            math_latex: True
+        EOF
+        
+        # Run conversion if vault exists
+        if [ -d "vault" ]; then
+          obsidianhtml convert -i config.yml
+        else
+          # Create fallback index.html if no vault exists yet
+          echo "<html><head><title>Obsidian Vault</title></head><body><h1>Obsidian Vault Website</h1><p>Add your notes to the vault/ directory!</p></body></html>" > output/index.html
+        fi
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+    
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './output'
+    
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
