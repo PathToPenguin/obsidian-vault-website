@@ -122,4 +122,4 @@ Dieses Projekt steht unter der MIT-Lizenz. Siehe [LICENSE](LICENSE) für Details
 
 ---
 
-💬 **Fragen?** Erstelle ein [Issue](https://github.com/PathToPenguin/obsidian-vault-website/issues) für Unterstützung!
+💬 **Fragen?** Erstelle ein [Issue](https://github.com/PathToPenguin/obsidian-vault-website/issues)
